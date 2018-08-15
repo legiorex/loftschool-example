@@ -68,33 +68,7 @@ function loadTowns() {
    isMatching('Moscow', 'Moscov') // false
  */
 function isMatching(full, chunk) {
-    for(i=0; i < full.length; i++){
-
-        console.log(i);
-
-        var x = full.indexOf(chunk, i);
-
-        console.log(x);
-
-        if (chunk <= full.length){
-            i = x + 1 ;
-        } else if (x === -1){
-            return false;
-        } else {
-            return true;
-        }
-
-        // if(x == -1){
-        //     return false;
-        // } else  {
-        //     i = x + 1 ;
-        // }
-
-        console.log(x);
-
-    }
-
-
+    return full.toUpperCase().indexOf(chunk.toUpperCase()) > -1;
 }
 
 /* Блок с надписью "Загрузка" */

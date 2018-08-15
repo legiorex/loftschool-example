@@ -10,9 +10,9 @@ function isMatching(full, chunk) {
 
 
 
-        if(x == -1){
+        if(x == -1 ){
             return false;
-        } else  {
+        } else if (x < -1 && )  {
             i = x + 1 ;
         }
 

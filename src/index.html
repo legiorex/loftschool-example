@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button id='button'>Нажми меня </button>
+<script>
+
+    var target = document.body;
+
+    var elements = target.getElementsByTagName('button');
+    for (i = 0; i < elements.length; i++){
+        var button = elements[i];
+    }
+    console.log(button);
+    button.addEventListener('click', function () {
+        console.log('кликнули на button');
+    } );
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

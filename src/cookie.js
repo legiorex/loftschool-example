@@ -32,14 +32,19 @@
    homeworkContainer.appendChild(newDiv);
  */
 const homeworkContainer = document.querySelector('#homework-container');
+
 // текстовое поле для фильтрации cookie
 const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
+
 // текстовое поле с именем cookie
 const addNameInput = homeworkContainer.querySelector('#add-name-input');
+
 // текстовое поле со значением cookie
 const addValueInput = homeworkContainer.querySelector('#add-value-input');
+
 // кнопка "добавить cookie"
 const addButton = homeworkContainer.querySelector('#add-button');
+
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
@@ -49,4 +54,67 @@ filterNameInput.addEventListener('keyup', function() {
 
 addButton.addEventListener('click', () => {
     // здесь можно обработать нажатие на кнопку "добавить cookie"
+
+    document.cookie = `${addNameInput.value}=${addValueInput.value}`; // записываем значения Кук
+
+    ///////////// Cоздаю таблицу ////////////////////
+
+    let trCookie = document.createElement('tr'); // создаем строку для кук
+    trCookie.classList.add('rowCookie'); // добавляем название класса для ново созданной строки
+
+    listTable.appendChild(trCookie); // добаляем новую строку в таблицу
+
+    let tdName = document.createElement('td'); // создаем столбец для Имени куки
+    let tdValue = document.createElement('td'); // создаем столбец для Значения куки
+    let tdDel = document.createElement('td'); // создаем столбец для Кнопки удалить
+
+    trCookie.appendChild(tdName); // добавляем столбец в строку
+    trCookie.appendChild(tdValue);
+    trCookie.appendChild(tdDel);
+
+
+    /////////// Получаю Куки, код взят из вебинара  ////////////////////////////
+
+    const cookies = document.cookie.split('; ').reduce((prev, current) => {
+        const [name, value] = current.split('=');
+        prev[name] = value;
+        return prev;
+    }, {});
+
+
+    ////////// Перебираю полученный объект со значениями Кук ///////////////////////
+
+    for (let key in cookies) {
+        tdName.textContent = key;
+        tdValue.textContent = cookies[key];
+    }
+
+    /////////// Очищаю поля ///////////////
+
+    addNameInput.value = '';
+    addValueInput.value = '';
+
+
+
+
 });
+function getCookies() {
+    return document.cookie
+        .split('; ')
+        .filter(Boolean)
+        .map(cookie => cookie.match(/^([^=]+)=(.+)/))
+        .reduce((obj, [, name, value]) => {
+            obj[name] = value;
+
+            return obj;
+        }, {});
+}
+
+const myCookies = getCookies();
+console.log(myCookies.hasOwnProperty('test-cookie-name-1'));
+console.log(myCookies['test-cookie-name-1']);
+console.log(listTable.children.length);
+
+addNameInput.value = 'test-cookie-name-1';
+addValueInput.value = 'test-cookie-value-1';
+addButton.click();

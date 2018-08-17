@@ -55,66 +55,60 @@ filterNameInput.addEventListener('keyup', function() {
 addButton.addEventListener('click', () => {
     // здесь можно обработать нажатие на кнопку "добавить cookie"
 
-    document.cookie = `${addNameInput.value}=${addValueInput.value}`; // записываем значения Кук
+    // обновление куки
 
-    ///////////// Cоздаю таблицу ////////////////////
+    function setCookie (name, value, options) {
+        options = options || {};
+        value = encodeURIComponent(value);
 
-    let trCookie = document.createElement('tr'); // создаем строку для кук
-    trCookie.classList.add('rowCookie'); // добавляем название класса для ново созданной строки
+        let updatedCookie = name + '=' + value;
 
-    listTable.appendChild(trCookie); // добаляем новую строку в таблицу
+        for (let propName in options) {
+            updatedCookie += '; ' + propName;
+            let propValue = options[propName];
+            if (propValue !== true) {
+                updatedCookie += '=' + propValue;
+            }
 
-    let tdName = document.createElement('td'); // создаем столбец для Имени куки
-    let tdValue = document.createElement('td'); // создаем столбец для Значения куки
-    let tdDel = document.createElement('td'); // создаем столбец для Кнопки удалить
+            document.cookie = updatedCookie;
+        }
+    }
 
-    trCookie.appendChild(tdName); // добавляем столбец в строку
-    trCookie.appendChild(tdValue);
-    trCookie.appendChild(tdDel);
+    // запуская функцию с параметрами
+    setCookie(addNameInput.value, addValueInput.value, 'path=/');
 
-
-    /////////// Получаю Куки, код взят из вебинара  ////////////////////////////
-
+    // получение куки
     const cookies = document.cookie.split('; ').reduce((prev, current) => {
         const [name, value] = current.split('=');
         prev[name] = value;
         return prev;
     }, {});
 
+    // построение таблицы
+    listTable.innerHTML = null;
 
-    ////////// Перебираю полученный объект со значениями Кук ///////////////////////
+    // Цикл перебора кук и запись их в таблицу
+    for (let key in cookies){
+            let trCookie = document.createElement('tr'); // создаем строку для кук
+            trCookie.classList.add(key); // добавляем название класса для ново созданной строки
+            trCookie.innerHTML = `<td>${key}</td><td>${cookies[key]}</td><td><button class="buttonDel">Удалить</button></td>`;
+            listTable.appendChild(trCookie); // добаляем новую строку в таблицу
 
-    for (let key in cookies) {
-        tdName.textContent = key;
-        tdValue.textContent = cookies[key];
+    // Кнопка удалить
+        let buttonDel = document.querySelector('.buttonDel');
+        buttonDel.addEventListener('click', () => { // навешиваю обработчик событий на click
+            trCookie.onclick = function(event) {
+                let target = event.target; // элемент на котором был клик
+                let targetElem = target.parentElement.parentElement; // получаем текущую строку в таблице, на которой клик
+
+                listTable.removeChild(targetElem); // удаляю записанные куки из таблицы
+
+                document.cookie = targetElem.className + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            };
+
+        });
     }
-
-    /////////// Очищаю поля ///////////////
-
+    // Очищаю поля
     addNameInput.value = '';
     addValueInput.value = '';
-
-
-
-
 });
-function getCookies() {
-    return document.cookie
-        .split('; ')
-        .filter(Boolean)
-        .map(cookie => cookie.match(/^([^=]+)=(.+)/))
-        .reduce((obj, [, name, value]) => {
-            obj[name] = value;
-
-            return obj;
-        }, {});
-}
-
-const myCookies = getCookies();
-console.log(myCookies.hasOwnProperty('test-cookie-name-1'));
-console.log(myCookies['test-cookie-name-1']);
-console.log(listTable.children.length);
-
-addNameInput.value = 'test-cookie-name-1';
-addValueInput.value = 'test-cookie-value-1';
-addButton.click();

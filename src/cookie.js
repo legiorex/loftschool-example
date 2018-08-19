@@ -48,134 +48,65 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('keyup', function() {
-    // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+function isMatching(full, chunk) {
+    return full.toUpperCase().indexOf(chunk.toUpperCase()) > -1;
+}
 
-    function isMatching(full, chunk) {
-        return full.toUpperCase().indexOf(chunk.toUpperCase()) > -1;
-    }
-
-
-    // обновление куки
-
-    function setCookie (name, value, options) {
-        options = options || {};
-        value = encodeURIComponent(value);
-
-        let updatedCookie = name + '=' + value;
-
-        for (let propName in options) {
-            updatedCookie += '; ' + propName;
-            let propValue = options[propName];
-            if (propValue !== true) {
-                updatedCookie += '=' + propValue;
-            }
-
-            document.cookie = updatedCookie;
-        }
-    }
-
-    // запуская функцию с параметрами
-    setCookie(addNameInput.value, addValueInput.value, 'path=/');
-
-    // получение куки
-    const cookies = document.cookie.split('; ').reduce((prev, current) => {
+function getCookies() {
+    return document.cookie.split('; ').reduce((prev, current) => {
         const [name, value] = current.split('=');
         prev[name] = value;
         return prev;
     }, {});
+}
 
+function bulderTable(){
+    const cookies = getCookies();
     // построение таблицы
     listTable.innerHTML = null;
 
-
-
-
     // Цикл перебора кук и запись их в таблицу
-    for (let key in cookies){
-        if (cookies.hasOwnProperty(key) &&(!filterNameInput.value
+
+    for (let key in cookies) {
+        if (cookies.hasOwnProperty(key) && (!filterNameInput.value
             || isMatching(key, filterNameInput.value)
-            || isMatching(cookies[key], filterNameInput.value))){
+            || isMatching(cookies[key], filterNameInput.value))) {
 
             let trCookie = document.createElement('tr'); // создаем строку для кук
-            trCookie.classList.add(key); // добавляем название класса для ново созданной строки
-            trCookie.innerHTML = `<td>${key}</td><td>${cookies[key]}</td><td><button class="buttonDel">Удалить</button></td>`;
+
+            trCookie.innerHTML = `<td>${key}</td><td>${cookies[key]}</td><td><button>Удалить</button></td>`;
             listTable.appendChild(trCookie); // добаляем новую строку в таблицу
 
             // Кнопка удалить
-            let buttonDel = document.querySelector('.buttonDel');
-            buttonDel.addEventListener('click', () => { // навешиваю обработчик событий на click
-                trCookie.onclick = function(event) {
-                    let target = event.target; // элемент на котором был клик
-                    let targetElem = target.parentElement.parentElement; // получаем текущую строку в таблице, на которой клик
+            trCookie.querySelector('button').addEventListener('click', () => { // навешиваю обработчик событий на click
 
-                    listTable.removeChild(targetElem); // удаляю записанные куки из таблицы
+                trCookie.remove(); // удаляю записанные куки из таблицы
 
-                    document.cookie = targetElem.className + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                };
+                document.cookie = `${key} = ${cookies[key]} =; expires=Thu, 01 Jan 1970 00:00:01 GMT`;
 
-        });
+
+            });
+        }
     }
-    }
+
+}
+filterNameInput.addEventListener('keyup', function() {
+    // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+
+   bulderTable();
 });
 
 addButton.addEventListener('click', () => {
     // здесь можно обработать нажатие на кнопку "добавить cookie"
 
-    // обновление куки
+    document.cookie = `${addNameInput.value} = ${addValueInput.value}`;
 
-    function setCookie (name, value, options) {
-        options = options || {};
-        value = encodeURIComponent(value);
-
-        let updatedCookie = name + '=' + value;
-
-        for (let propName in options) {
-            updatedCookie += '; ' + propName;
-            let propValue = options[propName];
-            if (propValue !== true) {
-                updatedCookie += '=' + propValue;
-            }
-
-            document.cookie = updatedCookie;
-        }
-    }
-
-    // запуская функцию с параметрами
-    setCookie(addNameInput.value, addValueInput.value, 'path=/');
-
-    // получение куки
-    const cookies = document.cookie.split('; ').reduce((prev, current) => {
-        const [name, value] = current.split('=');
-        prev[name] = value;
-        return prev;
-    }, {});
-
-    // построение таблицы
-    listTable.innerHTML = null;
-
-    // Цикл перебора кук и запись их в таблицу
-    for (let key in cookies){
-            let trCookie = document.createElement('tr'); // создаем строку для кук
-            trCookie.classList.add(key); // добавляем название класса для ново созданной строки
-            trCookie.innerHTML = `<td>${key}</td><td>${cookies[key]}</td><td><button class="buttonDel">Удалить</button></td>`;
-            listTable.appendChild(trCookie); // добаляем новую строку в таблицу
-
-    // Кнопка удалить
-        let buttonDel = document.querySelector('.buttonDel');
-        buttonDel.addEventListener('click', () => { // навешиваю обработчик событий на click
-            trCookie.onclick = function(event) {
-                let target = event.target; // элемент на котором был клик
-                let targetElem = target.parentElement.parentElement; // получаем текущую строку в таблице, на которой клик
-
-                listTable.removeChild(targetElem); // удаляю записанные куки из таблицы
-
-                document.cookie = targetElem.className + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            };
-
-        });
-    }
-    // Очищаю поля
-    addNameInput.value = '';
-    addValueInput.value = '';
+    bulderTable();
 });
+
+bulderTable();
+
+
+// Очищаю поля
+// addNameInput.value = '';
+// addValueInput.value = '';

@@ -50,6 +50,73 @@ const listTable = homeworkContainer.querySelector('#list-table tbody');
 
 filterNameInput.addEventListener('keyup', function() {
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+
+    function isMatching(full, chunk) {
+        return full.toUpperCase().indexOf(chunk.toUpperCase()) > -1;
+    }
+
+
+    // обновление куки
+
+    function setCookie (name, value, options) {
+        options = options || {};
+        value = encodeURIComponent(value);
+
+        let updatedCookie = name + '=' + value;
+
+        for (let propName in options) {
+            updatedCookie += '; ' + propName;
+            let propValue = options[propName];
+            if (propValue !== true) {
+                updatedCookie += '=' + propValue;
+            }
+
+            document.cookie = updatedCookie;
+        }
+    }
+
+    // запуская функцию с параметрами
+    setCookie(addNameInput.value, addValueInput.value, 'path=/');
+
+    // получение куки
+    const cookies = document.cookie.split('; ').reduce((prev, current) => {
+        const [name, value] = current.split('=');
+        prev[name] = value;
+        return prev;
+    }, {});
+
+    // построение таблицы
+    listTable.innerHTML = null;
+
+
+
+
+    // Цикл перебора кук и запись их в таблицу
+    for (let key in cookies){
+        if (cookies.hasOwnProperty(key) &&(!filterNameInput.value
+            || isMatching(key, filterNameInput.value)
+            || isMatching(cookies[key], filterNameInput.value))){
+
+            let trCookie = document.createElement('tr'); // создаем строку для кук
+            trCookie.classList.add(key); // добавляем название класса для ново созданной строки
+            trCookie.innerHTML = `<td>${key}</td><td>${cookies[key]}</td><td><button class="buttonDel">Удалить</button></td>`;
+            listTable.appendChild(trCookie); // добаляем новую строку в таблицу
+
+            // Кнопка удалить
+            let buttonDel = document.querySelector('.buttonDel');
+            buttonDel.addEventListener('click', () => { // навешиваю обработчик событий на click
+                trCookie.onclick = function(event) {
+                    let target = event.target; // элемент на котором был клик
+                    let targetElem = target.parentElement.parentElement; // получаем текущую строку в таблице, на которой клик
+
+                    listTable.removeChild(targetElem); // удаляю записанные куки из таблицы
+
+                    document.cookie = targetElem.className + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                };
+
+        });
+    }
+    }
 });
 
 addButton.addEventListener('click', () => {
